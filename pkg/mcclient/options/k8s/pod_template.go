@@ -191,6 +191,30 @@ func (o K8sLabelOptions) Attach(data *jsonutils.JSONDict) error {
 	return attachData(o, data, "labels")
 }
 
+type K8sAnnotationOptions struct {
+	Annotations []string `help:"Annotations to apply to the pod(s), e.g. 'key=value'"`
+}
+
+func (o K8sAnnotationOptions) Params() (*jsonutils.JSONDict, error) {
+	annotations := map[string]string{}
+	for _, annotation := range o.Annotations {
+		k, v, err := parseLabel(annotation)
+		if err != nil {
+			return nil, err
+		}
+		annotations[k] = v
+	}
+	params := jsonutils.Marshal(annotations).(*jsonutils.JSONDict)
+	return params, nil
+}
+
+func (o K8sAnnotationOptions) Attach(data *jsonutils.JSONDict) error {
+	if len(o.Annotations) == 0 {
+		return nil
+	}
+	return attachData(o, data, "annotations")
+}
+
 type K8sPVCTemplateOptions struct {
 	PvcTemplate []string `help:"PVC volume desc, format is <pvc_name>:<size>:<mount_point>"`
 }

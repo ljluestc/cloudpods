@@ -22,6 +22,7 @@ type DeploymentCreateOptions struct {
 	NamespaceWithClusterOptions
 
 	K8sLabelOptions
+	K8sAnnotationOptions
 	K8sPodTemplateOptions
 	ServiceSpecOptions
 
@@ -36,6 +37,9 @@ func (o DeploymentCreateOptions) Params() (jsonutils.JSONObject, error) {
 		return nil, err
 	}
 	if err := o.K8sLabelOptions.Attach(params); err != nil {
+		return nil, err
+	}
+	if err := o.K8sAnnotationOptions.Attach(params); err != nil {
 		return nil, err
 	}
 	if err := o.ServiceSpecOptions.Attach(params); err != nil {
