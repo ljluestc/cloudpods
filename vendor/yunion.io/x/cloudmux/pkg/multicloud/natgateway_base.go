@@ -48,3 +48,7 @@ func (nat *SNatGatewayBase) GetIpAddr() string {
 func (nat *SNatGatewayBase) GetBandwidthMb() int {
 	return 0
 }
+
+func (nat *SNatGatewayBase) SetNatSpec(spec string) error {
+	return errors.Wrapf(cloudprovider.ErrNotImplemented, "SetNatSpec")
+}

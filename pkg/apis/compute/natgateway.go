@@ -152,3 +152,10 @@ func (opts *NatgatewayCreateInput) Params() (jsonutils.JSONObject, error) {
 type NatgatewayDeleteInput struct {
 	Force bool `json:"force"`
 }
+
+type NatGatewayChangeSpecInput struct {
+	apis.Meta
+
+	// NAT规格
+	NatSpec string `json:"nat_spec"`
+}

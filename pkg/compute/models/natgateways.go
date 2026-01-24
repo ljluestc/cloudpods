@@ -996,6 +996,33 @@ func (self *SNatGateway) StartSetAutoRenewTask(ctx context.Context, userCred mcc
 	return task.ScheduleRun(nil)
 }
 
+func (self *SNatGateway) PerformChangeSpec(ctx context.Context, userCred mcclient.TokenCredential, query jsonutils.JSONObject, input api.NatGatewayChangeSpecInput) (jsonutils.JSONObject, error) {
+	if !utils.IsInStringArray(self.Status, []string{api.NAT_STAUTS_AVAILABLE}) {
+		return nil, httperrors.NewInvalidStatusError("Cannot do change spec nat gateway in status %s required status %s", self.Status, api.NAT_STAUTS_AVAILABLE)
+	}
+
+	if len(input.NatSpec) == 0 {
+		return nil, httperrors.NewMissingParameterError("nat_spec")
+	}
+
+	if self.NatSpec == input.NatSpec {
+		return nil, nil
+	}
+
+	return nil, self.StartChangeSpecTask(ctx, userCred, input.NatSpec, "")
+}
+
+func (self *SNatGateway) StartChangeSpecTask(ctx context.Context, userCred mcclient.TokenCredential, natSpec string, parentTaskId string) error {
+	data := jsonutils.NewDict()
+	data.Set("nat_spec", jsonutils.NewString(natSpec))
+	task, err := taskman.TaskManager.NewTask(ctx, "NatGatewayChangeSpecTask", self, userCred, data, parentTaskId, "", nil)
+	if err != nil {
+		return errors.Wrap(err, "NewTask")
+	}
+	self.SetStatus(ctx, userCred, api.NAT_STATUS_DEPLOYING, "")
+	return task.ScheduleRun(nil)
+}
+
 func (self *SNatEntry) GetINatGateway(ctx context.Context) (cloudprovider.ICloudNatGateway, error) {
 	model, err := NatGatewayManager.FetchById(self.NatgatewayId)
 	if err != nil {

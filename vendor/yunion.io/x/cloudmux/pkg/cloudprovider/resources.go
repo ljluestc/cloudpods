@@ -968,6 +968,7 @@ type ICloudNatGateway interface {
 	GetBandwidthMb() int
 	GetIpAddr() string
 
+	SetNatSpec(spec string) error
 	Delete() error
 }
 
